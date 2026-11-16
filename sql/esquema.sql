@@ -9,6 +9,7 @@ USE refugio_adopcion;
 
 -- Se eliminan en orden inverso a las dependencias
 DROP TABLE IF EXISTS solicitudes_adopcion;
+DROP TABLE IF EXISTS mascota_fotos;
 DROP TABLE IF EXISTS mascotas;
 DROP TABLE IF EXISTS especies;
 DROP TABLE IF EXISTS usuarios;
@@ -35,19 +36,40 @@ CREATE TABLE mascotas (
   id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
   especie_id    INT UNSIGNED NOT NULL,
   nombre        VARCHAR(100) NOT NULL,
+  sexo          ENUM('macho','hembra') NOT NULL DEFAULT 'macho',
+  raza          VARCHAR(80) NULL,
   descripcion   TEXT NULL,
   edad_meses    SMALLINT UNSIGNED NULL,
   tamano        ENUM('chico','mediano','grande') NOT NULL,
-  imagen        VARCHAR(255) NULL,
+  imagen        VARCHAR(255) NULL,              -- ruta relativa, p. ej. 'img/mascotas/luna.jpg'
   apto_ninos    BOOLEAN NOT NULL DEFAULT FALSE,
   apto_mascotas BOOLEAN NOT NULL DEFAULT FALSE,
+  esterilizado  BOOLEAN NOT NULL DEFAULT FALSE,
+  vacunado      BOOLEAN NOT NULL DEFAULT FALSE,
+  desparasitado BOOLEAN NOT NULL DEFAULT FALSE,
   disponible    BOOLEAN NOT NULL DEFAULT TRUE,
+  estado        ENUM('borrador','disponible','reservado','adoptado','en_tratamiento') NOT NULL DEFAULT 'disponible',
+  fecha_ingreso DATE NULL,
   PRIMARY KEY (id),
   KEY idx_mascotas_especie (especie_id),
   CONSTRAINT fk_mascotas_especie
     FOREIGN KEY (especie_id) REFERENCES especies (id)
     ON UPDATE CASCADE
     ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+-- Tabla para galería de múltiples fotos por mascota
+CREATE TABLE mascota_fotos (
+  id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  mascota_id INT UNSIGNED NOT NULL,
+  ruta       VARCHAR(255) NOT NULL,
+  es_portada BOOLEAN NOT NULL DEFAULT FALSE,
+  PRIMARY KEY (id),
+  KEY idx_fotos_mascota (mascota_id),
+  CONSTRAINT fk_fotos_mascota
+    FOREIGN KEY (mascota_id) REFERENCES mascotas (id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE solicitudes_adopcion (
@@ -69,3 +91,6 @@ CREATE TABLE solicitudes_adopcion (
     ON UPDATE CASCADE
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+-- Asegurar especies base
+INSERT IGNORE INTO especies (id, nombre) VALUES (1, 'Perro'), (2, 'Gato');

@@ -35,6 +35,11 @@ $tituloDoc = isset($titulo) ? $titulo . ' | Huellitas' : 'Huellitas';
 
     <header class="top">
         <div class="contenedor_header top-in">
+            <?php if ($usuario && ($usuario['rol'] ?? '') === 'admin'): ?>
+                <a href="registro_mascotas.php" <?= $activo === 'registro_mascotas' ? 'aria-current="page"' : '' ?>>Registrar mascota</a>
+                <a href="lista_mascotas.php" <?= $activo === 'lista_mascotas' ? 'aria-current="page"' : '' ?>>Buscar mascota</a>
+            <?php endif; ?>
+
             <a class="logo" href="inicio.php">
                 <svg class="logo-pata" aria-hidden="true"><use href="#pata"/></svg>
                 Huellitas
