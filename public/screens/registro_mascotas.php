@@ -301,14 +301,29 @@ $err = function (string $campo) use ($errores): string {
         : '';
 };
 
-$titulo = $editando ? 'Editar mascota' : 'Registrar mascota';
-$activo = 'mascotas';
-require __DIR__ . '/../partials/header.php';
+$titulo      = $editando ? 'Editar mascota' : 'Registrar mascota';
+$adminActivo = 'Mascotas';
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?= e($titulo) ?> | Huellitas</title>
+    <link rel="icon" href="../favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Fraunces:opsz,wght@9..144,900&display=swap">
+    <link rel="stylesheet" href="../css/huellitas.css">
+</head>
+<body class="admin-body">
+<div class="admin">
+<?php require __DIR__ . '/../partials/admin_lado.php'; ?>
+<main class="admin-main">
 
 <style>
     /* Estilos propios de este formulario (usan las variables de huellitas.css) */
-    .rm { padding-block: 32px 64px; }
+    .rm { width: 100%; }
 
     .rm-cab {
         display: flex;
@@ -452,7 +467,7 @@ require __DIR__ . '/../partials/header.php';
     .quitar input { width: auto; margin: 0; padding: 0; accent-color: var(--naranja); }
 </style>
 
-<form class="contenedor_footer" method="post" action="registro_mascotas.php<?= $editando ? '?id=' . $id : '' ?>" enctype="multipart/form-data" novalidate>
+<form class="rm" method="post" action="registro_mascotas.php<?= $editando ? '?id=' . $id : '' ?>" enctype="multipart/form-data" novalidate>
     <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
     <?php if ($editando): ?><input type="hidden" name="id" value="<?= $id ?>"><?php endif; ?>
 
@@ -688,4 +703,7 @@ require __DIR__ . '/../partials/header.php';
 })();
 </script>
 
-<?php require __DIR__ . '/../partials/footer.php'; ?>
+</main>
+</div>
+</body>
+</html>

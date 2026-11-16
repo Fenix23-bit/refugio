@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'correo' => $u['correo'],
                 'rol'    => $u['rol'],
             ];
-            header('Location: panel.php');
+            header('Location: ' . ($u['rol'] === 'admin' ? 'admin.php' : 'panel.php'));
             exit;
         }
         $error = 'El correo o la contraseña no coinciden. Revísalos e intenta de nuevo.';

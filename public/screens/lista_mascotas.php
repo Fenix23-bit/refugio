@@ -138,14 +138,29 @@ $fecha = function (?string $f): string {
     return $t ? date('j', $t) . ' ' . MESES[(int) date('n', $t) - 1] . ' ' . date('Y', $t) : '—';
 };
 
-$titulo = 'Mascotas';
-$activo = 'mascotas';
-require __DIR__ . '/../partials/header.php';
+$titulo      = 'Mascotas';
+$adminActivo = 'Mascotas';
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?= e($titulo) ?> | Huellitas</title>
+    <link rel="icon" href="../favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Fraunces:opsz,wght@9..144,900&display=swap">
+    <link rel="stylesheet" href="../css/huellitas.css">
+</head>
+<body class="admin-body">
+<div class="admin">
+<?php require __DIR__ . '/../partials/admin_lado.php'; ?>
+<main class="admin-main">
 
 <style>
     /* Estilos propios de esta página (usan las variables de huellitas.css) */
-    .lm { padding-block: 32px 64px; }
+    .lm { width: 100%; }
 
     .lm-cab {
         display: flex;
@@ -237,7 +252,7 @@ require __DIR__ . '/../partials/header.php';
     .pag .off { opacity: .35; }
 </style>
 
-<div class="contenedor lm">
+<div class="lm">
 
     <div class="lm-cab">
         <h1>Mascotas <span class="cuenta">· <?= $total ?></span></h1>
@@ -378,4 +393,7 @@ require __DIR__ . '/../partials/header.php';
     <?php endif; ?>
 </div>
 
-<?php require __DIR__ . '/../partials/footer.php'; ?>
+</main>
+</div>
+</body>
+</html>

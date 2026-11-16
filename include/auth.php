@@ -39,3 +39,13 @@ function requiere_login(): array
     }
     return $u;
 }
+
+function requiere_admin(): array
+{
+    $u = requiere_login();
+    if (($u['rol'] ?? '') !== 'admin') {
+        header('Location: panel.php');
+        exit;
+    }
+    return $u;
+}

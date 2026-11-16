@@ -51,6 +51,9 @@ $tituloDoc = isset($titulo) ? $titulo . ' | Huellitas' : 'Huellitas';
                 <a href="mascotas.php">Mascotas</a>
                 <a href="comoAdoptar.php">Cómo adoptar</a>
                 <?php if ($usuario): ?>
+                    <?php if (($usuario['rol'] ?? '') === 'admin'): ?>
+                        <a href="admin.php">Panel admin</a>
+                    <?php endif; ?>
                     <a href="panel.php" <?= $activo === 'panel' ? 'aria-current="page"' : '' ?>>Mi cuenta</a>
                     <form method="post" action="logout.php">
                         <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">

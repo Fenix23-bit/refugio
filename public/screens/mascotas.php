@@ -15,17 +15,48 @@ function edad_texto($meses): string
     return $anios . ($anios === 1 ? ' año' : ' años');
 }
 
+$leer = function (string $campo, array $permitidos): string {
+    $v = $_GET[$campo] ?? '';
+    return is_string($v) && in_array($v, $permitidos, true) ? $v : '';
+};
+$filtros = [
+    'especie' => $leer('especie', ['perro', 'gato']),
+    'edad'    => $leer('edad', ['cachorro', 'joven', 'adulto']),
+    'tamano'  => $leer('tamano', ['chico', 'mediano', 'grande']),
+];
+$hayFiltros = (bool) array_filter($filtros);
+$conTodos   = true;
+
+$sql    = 'SELECT m.id, m.nombre, m.edad_meses, m.tamano, m.imagen, m.apto_ninos, m.apto_mascotas,
+                  s.nombre AS especie
+             FROM mascotas m
+             JOIN especies s ON s.id = m.especie_id
+            WHERE m.disponible = 1';
+$params = [];
+
+if ($filtros['especie'] !== '') {
+    $sql .= ' AND LOWER(s.nombre) = ?';
+    $params[] = $filtros['especie'];
+}
+if ($filtros['tamano'] !== '') {
+    $sql .= ' AND m.tamano = ?';
+    $params[] = $filtros['tamano'];
+}
+
+if ($filtros['edad'] === 'cachorro') {
+    $sql .= ' AND m.edad_meses < 12';
+} elseif ($filtros['edad'] === 'joven') {
+    $sql .= ' AND m.edad_meses BETWEEN 12 AND 35';
+} elseif ($filtros['edad'] === 'adulto') {
+    $sql .= ' AND m.edad_meses >= 36';
+}
+$sql .= ' ORDER BY m.id DESC LIMIT 60';
+
 $mascotas = [];
 try {
-    $mascotas = $pdo->query(
-        'SELECT m.id, m.nombre, m.edad_meses, m.tamano, m.imagen, m.apto_ninos, m.apto_mascotas,
-                s.nombre AS especie
-           FROM mascotas m
-           JOIN especies s ON s.id = m.especie_id
-          WHERE m.disponible = 1
-          ORDER BY m.id DESC
-          LIMIT 6'
-    )->fetchAll();
+    $st = $pdo->prepare($sql);
+    $st->execute($params);
+    $mascotas = $st->fetchAll();
 } catch (PDOException $ex) {
     $mascotas = [];
 }
@@ -39,7 +70,17 @@ require __DIR__ . '/../partials/header.php';
     <div class="contenedor">
         <h2>Mascotas que buscan casa</h2>
 
-        <?php if (!$mascotas): ?>
+        <div class="filtros-barra">
+            <?php require __DIR__ . '/../partials/filtros.php'; ?>
+            <p class="filtros-info" role="status">
+                <?= count($mascotas) ?> <?= count($mascotas) === 1 ? 'resultado' : 'resultados' ?>
+                <?php if ($hayFiltros): ?> · <a href="mascotas.php">Quitar filtros</a><?php endif; ?>
+            </p>
+        </div>
+
+        <?php if (!$mascotas && $hayFiltros): ?>
+            <p class="vacio">No encontramos mascotas con esos filtros. Prueba cambiando la edad o el tamaño.</p>
+        <?php elseif (!$mascotas): ?>
             <p class="vacio">Aún no hay mascotas publicadas. Cuando el refugio agregue nuevas, aparecerán aquí.</p>
         <?php else: ?>
             <ul class="tarjetas">

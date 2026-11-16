@@ -16,45 +16,96 @@ function edad_texto($meses): string
 }
 
 $mascotas = [];
+$total    = 0;
 try {
     $mascotas = $pdo->query(
-        'SELECT m.id, m.nombre, m.edad_meses, m.tamano, m.imagen, m.apto_ninos, m.apto_mascotas,
-                s.nombre AS especie
+        'SELECT m.id, m.nombre, m.edad_meses, m.tamano, m.imagen, s.nombre AS especie
            FROM mascotas m
            JOIN especies s ON s.id = m.especie_id
           WHERE m.disponible = 1
           ORDER BY m.id DESC
-          LIMIT 6'
+          LIMIT 4'
     )->fetchAll();
+    $total = (int) $pdo->query('SELECT COUNT(*) FROM mascotas WHERE disponible = 1')->fetchColumn();
 } catch (PDOException $ex) {
     $mascotas = [];
 }
 
-$usuario  = usuario_actual();
+$destacada = $mascotas[0] ?? null;
+$otras     = array_slice($mascotas, 1, 3);
+$restantes = max(0, $total - count($mascotas));
+
+$usuario   = usuario_actual();
 $bodyClass = 'inicio';
 require __DIR__ . '/../partials/header.php';
 ?>
 
-<section class="home">
-    <div class="contenedor home-in">
-        <div class="home-texto">
-            <h1>Un hogar para cada huellita.</h1>
-            <p class="home-sub">Conoce a los perros y gatos del refugio y envía tu solicitud de adopción en línea.</p>
-            <div class="home-acciones">
-                <a class="btn" href="mascotas.php">Ver mascotas</a>
-                <?php if ($usuario): ?>
-                    <a class="btn btn-sec" href="panel.php">Mi cuenta</a>
+<section class="buscador">
+    <div class="contenedor">
+        <h1>¿A quién vas a adoptar hoy?</h1>
+
+        <?php
+        $filtros  = ['especie' => 'perro', 'edad' => '', 'tamano' => ''];
+        $conTodos = false;
+        require __DIR__ . '/../partials/filtros.php';
+        ?>
+    </div>
+</section>
+
+<section class="espera">
+    <div class="contenedor">
+        <h2>Te están esperando</h2>
+
+        <div class="espera-grid">
+            <a class="ph ph-grande" href="mascotas.php">
+                <?php if ($destacada && !empty($destacada['imagen'])): ?>
+                    <img src="../<?= e($destacada['imagen']) ?>" alt="<?= e($destacada['nombre']) ?>">
                 <?php else: ?>
-                    <a class="btn btn-sec" href="registro.php">Crear cuenta</a>
+                    <span>foto grande · destacada de la semana</span>
                 <?php endif; ?>
-            </div>
+            </a>
+
+            <?php for ($i = 0; $i < 3; $i++): $m = $otras[$i] ?? null; ?>
+                <a class="ph" href="mascotas.php">
+                    <?php if ($m && !empty($m['imagen'])): ?>
+                        <img src="../<?= e($m['imagen']) ?>" alt="<?= e($m['nombre']) ?>" loading="lazy">
+                    <?php endif; ?>
+                    <span class="<?= ($m && !empty($m['imagen'])) ? 'ph-nombre' : '' ?>"><?= e($m['nombre'] ?? '') ?></span>
+                </a>
+            <?php endfor; ?>
+
+            <a class="ph ph-mas" href="mascotas.php">
+                <span>+ <?= $restantes ?> más →</span>
+            </a>
         </div>
 
-        <div class="home-arte" aria-hidden="true">
-            <svg class="pa pa1"><use href="#pata"/></svg>
-            <svg class="pa pa2"><use href="#pata"/></svg>
-            <svg class="pa pa3"><use href="#pata"/></svg>
-            <svg class="pa pa4"><use href="#pata"/></svg>
+        <?php if ($destacada): ?>
+            <p class="espera-pie">
+                <?= e($destacada['nombre']) ?> · <?= e($destacada['especie']) ?> · <?= e(edad_texto($destacada['edad_meses'])) ?>
+            </p>
+        <?php endif; ?>
+    </div>
+</section>
+
+<section class="tres-pasos">
+    <div class="contenedor">
+        <h2>Adoptar en 3 pasos</h2>
+        <ol class="pasos-linea">
+            <li><span class="num">1</span><b>Elige</b></li>
+            <li><span class="num">2</span><b>Solicita</b></li>
+            <li><span class="num">3</span><b>Conócelo</b></li>
+        </ol>
+    </div>
+</section>
+
+<section class="historias">
+    <div class="contenedor historias-in">
+        
+        <div class="ph ph-familia"><img src="../img/mascotas/toby-adoptado.jpg"><span>foto familia</span></div>
+        <div>
+            <p class="historias-etq">HISTORIAS</p>
+            <blockquote>"Toby cambió nuestra casa por completo."</blockquote>
+            <p class="historias-autor">— Familia Pérez · ‹ ›</p>
         </div>
     </div>
 </section>
