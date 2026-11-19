@@ -1146,3 +1146,452 @@ html:not(.js) .campo-pass input {
 .filtros-info a {
     font-weight: 600;
 }
+
+/*Catálogo*/
+.catalogo-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 36px;
+    align-items: start;
+}
+
+.catalogo-sidebar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.catalogo-sidebar-top h2,
+.catalogo-top h2 {
+    margin-bottom: 0;
+    font-size: 1.45rem;
+}
+
+.catalogo-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.catalogo-top select {
+    width: auto;
+    padding: 8px 18px;
+    font-size: .85rem;
+}
+
+.filtro-grupo {
+    border: 0;
+    margin: 0 0 20px;
+    padding: 0;
+}
+
+.filtro-grupo legend,
+.filtro-titulo-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--cafe);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+}
+
+.filtro-grupo .chips {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filtro-grupo select {
+    padding: 8px 16px;
+    font-size: .85rem;
+}
+
+.chip-circulo span {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+}
+
+.check-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.check-lista label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--verde);
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.check-lista input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--verde);
+    cursor: pointer;
+}
+
+.limpiar-filtros {
+    display: inline-block;
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.catalogo-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.btn-movil-filtros,
+.cerrar-filtros,
+.aplicar-movil {
+    display: none;
+}
+
+@media (max-width: 760px) {
+    .catalogo-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .orden-form {
+        display: none;
+    }
+
+    .btn-movil-filtros {
+        display: inline-block;
+        padding: 8px 18px;
+        font-size: .85rem;
+    }
+
+    .cerrar-filtros {
+        display: inline-block;
+        padding: 6px 12px;
+        font-size: .85rem;
+    }
+
+    .aplicar-movil {
+        display: block;
+    }
+
+    .catalogo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .catalogo-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 35;
+        background: rgba(36, 58, 51, .45);
+    }
+
+    .catalogo-sidebar {
+        position: fixed;
+        inset: auto 0 0 0;
+        z-index: 40;
+        max-height: 82vh;
+        overflow-y: auto;
+        padding: 24px 20px 30px;
+        border-top: 1.5px solid var(--verde);
+        border-radius: 28px 28px 0 0;
+        background: var(--bg);
+        transform: translateY(105%);
+        transition: transform .25s ease;
+    }
+
+    .catalogo-sidebar.abierto {
+        transform: translateY(0);
+    }
+}
+
+.tarjeta-link {
+    display: block;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+}
+
+.tarjeta-mascota {
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.tarjeta-mascota:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(36, 58, 51, .12);
+}
+
+/* =========================================================
+   Ficha de Mascota 1i (Pestañas + progreso de adopción)
+   ========================================================= */
+.ficha-seccion {
+    padding-block: 24px 56px;
+}
+
+.ficha-breadcrumb {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: .82rem;
+    color: var(--cafe);
+}
+
+.ficha-breadcrumb a {
+    text-decoration: none;
+}
+
+.ficha-breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+/* Marco Hero de Fotos */
+.ficha-hero {
+    position: relative;
+    height: clamp(260px, 44vw, 410px);
+    overflow: hidden;
+    border: 1.5px dashed #8a8f88;
+    border-radius: 32px;
+    background: var(--papel);
+}
+
+.ficha-slides,
+.ficha-slide {
+    width: 100%;
+    height: 100%;
+}
+
+.ficha-slide {
+    display: none;
+    object-fit: cover;
+    object-position: center 30%;
+}
+
+.ficha-slide.activa {
+    display: block;
+}
+
+.ficha-vacia {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    background: var(--rosa);
+}
+
+.ficha-vacia svg {
+    width: 72px;
+    height: 72px;
+    fill: var(--verde);
+    opacity: .45;
+}
+
+.ficha-hero-pie {
+    position: absolute;
+    left: 26px;
+    right: 26px;
+    bottom: 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    pointer-events: none;
+}
+
+.ficha-nombre {
+    padding: 4px 16px;
+    border-radius: 999px;
+    background: rgba(250, 246, 238, .92);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    pointer-events: auto;
+}
+
+.ficha-contador {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    border: 1.5px solid var(--verde);
+    border-radius: 999px;
+    background: rgba(250, 246, 238, .92);
+    font-size: .8rem;
+    font-weight: 600;
+    pointer-events: auto;
+}
+
+.ficha-contador button {
+    border: 0;
+    background: none;
+    color: var(--verde);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+/* Pestañas tipo píldora */
+.ficha-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.ficha-tab {
+    padding: 7px 20px;
+    border: 1.5px solid var(--verde);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--verde);
+    font: 600 .85rem var(--sans);
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+
+.ficha-tab:hover {
+    background: var(--salvia);
+}
+
+.ficha-tab.activa {
+    background: #6b7468;
+    border-color: #6b7468;
+    color: #fff;
+}
+
+/* Cuerpo 2 columnas: Descripción / Tab activo + Apta para */
+.ficha-cuerpo {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 44px;
+    align-items: start;
+    margin-top: 24px;
+}
+
+.ficha-meta {
+    margin: 0 0 14px;
+    color: var(--cafe);
+    font-weight: 600;
+    font-size: .95rem;
+}
+
+.ficha-descripcion p {
+    margin: 0 0 12px;
+    max-width: 62ch;
+}
+
+.ficha-ingreso {
+    margin: 16px 0 0;
+    font-size: .82rem;
+    color: var(--cafe);
+}
+
+.ficha-checklist,
+.ficha-apto-lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ficha-checklist li,
+.ficha-apto-lista li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .92rem;
+}
+
+.ficha-checklist li.no,
+.ficha-apto-lista li.no {
+    opacity: .6;
+}
+
+.ficha-apto h2 {
+    margin-bottom: 12px;
+    color: var(--cafe);
+    font-family: var(--sans);
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+}
+
+/* Miniaturas en pestaña Fotos */
+.ficha-galeria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.ficha-thumb {
+    padding: 0;
+    overflow: hidden;
+    border: 1.5px solid var(--verde);
+    border-radius: 18px;
+    background: var(--papel);
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+}
+
+.ficha-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Franja inferior salvia: ¿Cómo adoptar a...? */
+.ficha-adopcion {
+    padding-block: 44px 56px;
+}
+
+.ficha-adopcion h2 {
+    margin-bottom: 24px;
+    font-size: clamp(1.35rem, 3vw, 1.7rem);
+}
+
+.ficha-pasos {
+    max-width: 780px;
+}
+
+.ficha-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+@media (max-width: 760px) {
+    .ficha-breadcrumb {
+        justify-content: flex-start;
+    }
+
+    .ficha-cuerpo {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .ficha-hero-pie {
+        left: 16px;
+        right: 16px;
+        bottom: 14px;
+    }
+
+    .ficha-pasos {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .ficha-pasos li {
+        flex-direction: column;
+        text-align: center;
+        gap: 6px;
+    }
+}
