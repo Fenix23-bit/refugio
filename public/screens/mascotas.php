@@ -226,15 +226,7 @@ require __DIR__ . '/../partials/header.php';
                     </div>
                 </fieldset>
 
-                <div class="filtro-grupo">
-                    <label for="filtro-raza" class="filtro-titulo-label">RAZA</label>
-                    <select id="filtro-raza" name="raza">
-                        <option value="">Todas</option>
-                        <?php foreach ($razasDisponibles as $r): ?>
-                            <option value="<?= e($r) ?>" <?= $filtros['raza'] === $r ? 'selected' : '' ?>><?= e($r) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                
 
                 <fieldset class="filtro-grupo">
                     <legend>CONVIVENCIA</legend>

@@ -13,6 +13,9 @@
                 <a href="mascotas.php">Mascotas</a>
                 <a href="comoAdoptar.php">Cómo adoptar</a>
                 <?php if (usuario_actual()): ?>
+                    <?php if ((usuario_actual()['rol'] ?? '') === 'admin'): ?>
+                        <a href="admin.php">Panel admin</a>
+                    <?php endif; ?>
                     <a href="panel.php">Mi cuenta</a>
                 <?php else: ?>
                     <a href="login.php">Iniciar sesión</a>

@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../include/auth.php';
 
 if (usuario_actual()) {
-    header('Location: panel.php');
+    header('Location: ' . ((usuario_actual()['rol'] ?? '') === 'admin' ? 'admin.php' : 'panel.php'));
     exit;
 }
 

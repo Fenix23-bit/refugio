@@ -152,105 +152,14 @@ $adminActivo = 'Mascotas';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Fraunces:opsz,wght@9..144,900&display=swap">
     <link rel="stylesheet" href="../css/huellitas.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <script>document.documentElement.classList.add('js');</script>
 </head>
 <body class="admin-body">
 <div class="admin">
 <?php require __DIR__ . '/../partials/admin_lado.php'; ?>
 <main class="admin-main">
 
-<style>
-    /* Estilos propios de esta página (usan las variables de huellitas.css) */
-    .lm { width: 100%; }
-
-    .lm-cab {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 28px;
-    }
-    .lm h1 { font-size: clamp(2rem, 5vw, 2.8rem); }
-    .lm h1 .cuenta { color: var(--cafe); }
-
-    .solo-lector {
-        position: absolute; width: 1px; height: 1px; overflow: hidden;
-        clip: rect(0 0 0 0); white-space: nowrap;
-    }
-
-    .filtros { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 28px; }
-    .filtros .buscar { flex: 1 1 260px; }
-    .filtros select { flex: 0 1 170px; width: auto; }
-
-    .tabla-cont { overflow-x: auto; }
-    .lista { width: 100%; min-width: 680px; border-collapse: collapse; }
-    .lista th {
-        padding: 0 12px 12px;
-        border-bottom: 1.5px solid var(--verde);
-        color: var(--cafe);
-        font: 700 .85rem var(--sans);
-        letter-spacing: .08em;
-        text-align: left;
-        text-transform: uppercase;
-    }
-    .lista td {
-        padding: 14px 12px;
-        border-bottom: 1px solid rgba(36, 58, 51, .25);
-        vertical-align: middle;
-    }
-    .lista tbody tr:hover { background: var(--papel); }
-
-    .mascota-celda { display: flex; align-items: center; gap: 16px; }
-    .mascota-celda a { font-weight: 600; font-size: 1.05rem; text-decoration: none; }
-    .mascota-celda a:hover { text-decoration: underline; }
-    .cod { display: block; color: var(--cafe); font-size: .8rem; font-weight: 400; }
-
-    .mini-foto, .mini-vacia {
-        flex: none; width: 48px; height: 48px; border-radius: 50%;
-    }
-    .mini-foto { object-fit: cover; border: 1.5px solid var(--verde); }
-    .mini-vacia {
-        display: grid; place-items: center;
-        border: 1.5px dashed var(--verde);
-    }
-    .mini-vacia svg { width: 22px; height: 22px; fill: var(--verde); opacity: .5; }
-
-    .est-form { display: flex; align-items: center; gap: 8px; margin: 0; }
-    .pill {
-        width: auto; min-width: 150px;
-        padding: 6px 14px;
-        border: 1.5px solid var(--verde);
-        border-radius: 999px;
-        background: var(--papel);
-        color: var(--verde);
-        font: 600 .85rem var(--sans);
-        cursor: pointer;
-    }
-    .pill option { background: var(--papel); color: var(--verde); }
-    .est-reservado      { background: var(--verde); color: var(--bg); }
-    .est-adoptado       { background: var(--salvia); }
-    .est-en_tratamiento { background: var(--rosa); }
-    .est-borrador       { border-style: dashed; }
-    .pill-ok { padding: 6px 12px; font-size: .8rem; }
-    html.js .pill-ok { display: none; }
-
-    .btn-mini { padding: 7px 18px; font-size: .9rem; }
-
-    .lm-pie {
-        display: flex; flex-wrap: wrap; align-items: center;
-        justify-content: space-between; gap: 16px;
-        margin-top: 24px; font-size: .94rem;
-    }
-    .pag { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-    .pag a, .pag span {
-        min-width: 38px; padding: 6px 10px;
-        border: 1.5px solid transparent; border-radius: 999px;
-        text-align: center; text-decoration: none; font-weight: 600;
-    }
-    .pag a:hover { background: var(--salvia); }
-    .pag [aria-current="page"] { background: var(--verde); color: var(--bg); }
-    .pag .off { opacity: .35; }
-</style>
 
 <div class="lm">
 
@@ -337,7 +246,7 @@ $adminActivo = 'Mascotas';
                             <form class="est-form" method="post" action="lista_mascotas.php<?= e($qs()) ?>">
                                 <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
                                 <input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
-                                <select class="pill est-<?= e($m['estado']) ?>" name="estado_nuevo"
+                                <select class="sel-est est-<?= e($m['estado']) ?>" name="estado_nuevo"
                                         aria-label="Estado de <?= e($m['nombre']) ?>"
                                         onchange="this.form.submit()">
                                     <?php foreach (ESTADOS as $valor => $texto): ?>
@@ -346,7 +255,7 @@ $adminActivo = 'Mascotas';
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <button class="btn btn-sec pill-ok" type="submit">OK</button>
+                                <button class="btn btn-sec btn-ok" type="submit">OK</button>
                             </form>
                         </td>
                         <td>
@@ -360,7 +269,7 @@ $adminActivo = 'Mascotas';
         </div>
 
         <div class="lm-pie">
-            <p style="margin:0">Mostrando <?= $desde ?>–<?= $hasta ?> de <?= $total ?></p>
+            <p class="sin-margen">Mostrando <?= $desde ?>–<?= $hasta ?> de <?= $total ?></p>
 
             <?php if ($paginas > 1): ?>
                 <nav class="pag" aria-label="Paginación">

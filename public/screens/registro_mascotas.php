@@ -315,157 +315,13 @@ $adminActivo = 'Mascotas';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Fraunces:opsz,wght@9..144,900&display=swap">
     <link rel="stylesheet" href="../css/huellitas.css">
+    <link rel="stylesheet" href="../css/admin.css">
 </head>
 <body class="admin-body">
 <div class="admin">
 <?php require __DIR__ . '/../partials/admin_lado.php'; ?>
 <main class="admin-main">
 
-<style>
-    /* Estilos propios de este formulario (usan las variables de huellitas.css) */
-    .rm { width: 100%; }
-
-    .rm-cab {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 32px;
-    }
-    .rm-ruta { margin: 0 0 6px; font-size: .9rem; }
-    .rm-ruta a { text-decoration: none; }
-    .rm-ruta a:hover { text-decoration: underline; }
-    .rm h1 { font-size: clamp(2rem, 5vw, 2.8rem); }
-    .rm-acciones { display: flex; flex-wrap: wrap; gap: 12px; }
-
-    .rm-grid { display: grid; gap: 36px; }
-    @media (min-width: 860px) {
-        .rm-grid { grid-template-columns: 1.1fr .9fr; gap: 48px; }
-    }
-
-    .rm-sec { margin: 0 0 32px; padding: 0; border: 0; min-width: 0; }
-    .rm-sec legend, .rm-sec .rm-tit {
-        display: block;
-        margin: 0 0 14px;
-        padding: 0;
-        color: var(--cafe);
-        font: 700 .85rem var(--sans);
-        letter-spacing: .08em;
-        text-transform: uppercase;
-    }
-
-    .rm-fila { display: grid; gap: 0 16px; }
-    @media (min-width: 560px) {
-        .rm-fila { grid-template-columns: 1fr 1fr; }
-    }
-
-    .rm-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-    .rm-chips-etq { margin: 0 6px 0 0; color: var(--verde); font-weight: 400; }
-
-    .chip { position: relative; display: inline-block; margin: 0; }
-    .chip input {
-        position: absolute; inset: 0; width: 100%; height: 100%;
-        margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer;
-    }
-    .chip span {
-        display: block;
-        min-width: 48px;
-        padding: 8px 22px;
-        border: 1.5px solid var(--verde);
-        border-radius: 999px;
-        background: var(--papel);
-        color: var(--verde);
-        font-weight: 600;
-        text-align: center;
-    }
-    .chip input:checked + span { background: var(--verde); color: var(--bg); }
-    .chip input:focus-visible + span { outline: 3px solid var(--naranja); outline-offset: 2px; }
-
-    .rm-checks { display: grid; gap: 12px 24px; }
-    @media (min-width: 560px) {
-        .rm-checks { grid-template-columns: 1fr 1fr; }
-    }
-    .check {
-        display: flex; align-items: center; gap: 10px;
-        margin: 0; color: var(--verde); font-size: 1rem; font-weight: 400; cursor: pointer;
-    }
-    .check input {
-        flex: none; width: 20px; height: 20px; margin: 0; padding: 0;
-        accent-color: var(--naranja);
-    }
-
-    textarea {
-        width: 100%;
-        min-height: 150px;
-        padding: 16px 20px;
-        border: 1.5px solid var(--verde);
-        border-radius: 28px;
-        background: var(--bg);
-        color: var(--verde);
-        font: inherit;
-        resize: vertical;
-    }
-    textarea:focus { outline: 3px solid var(--naranja); outline-offset: 1px; }
-
-    .dropzone {
-        position: relative;
-        display: grid;
-        place-items: center;
-        min-height: 220px;
-        margin: 0;
-        padding: 24px;
-        border: 2px dashed var(--verde);
-        border-radius: 32px;
-        background: var(--papel);
-        color: var(--verde);
-        font-weight: 400;
-        text-align: center;
-        cursor: pointer;
-    }
-    .dropzone:hover, .dropzone.sobre { background: var(--salvia); }
-    .dropzone:focus-within { outline: 3px solid var(--naranja); outline-offset: 2px; }
-    .dropzone input {
-        position: absolute; inset: 0; width: 100%; height: 100%;
-        margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer;
-    }
-    .dropzone strong { display: block; font-weight: 600; }
-
-    .previas {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin: 12px 0 0;
-        padding: 0;
-        list-style: none;
-    }
-    .previas li {
-        position: relative;
-        aspect-ratio: 1;
-        overflow: hidden;
-        border: 2px dashed var(--verde);
-        border-radius: 24px;
-        background: var(--papel);
-    }
-    .previas li.llena { border-style: solid; }
-    .previas img { display: block; width: 100%; height: 100%; object-fit: cover; }
-    .previas .portada {
-        position: absolute; left: 8px; bottom: 8px;
-        padding: 2px 10px;
-        border-radius: 999px;
-        background: var(--verde); color: var(--bg);
-        font-size: .72rem; font-weight: 600;
-    }
-    .previas.actuales { margin: 0 0 12px; }
-    .quitar {
-        position: absolute; top: 8px; right: 8px;
-        display: flex; align-items: center; gap: 4px;
-        margin: 0; padding: 2px 10px 2px 8px;
-        border-radius: 999px; background: var(--papel);
-        color: var(--verde); font-size: .72rem; font-weight: 600; cursor: pointer;
-    }
-    .quitar input { width: auto; margin: 0; padding: 0; accent-color: var(--naranja); }
-</style>
 
 <form class="rm" method="post" action="registro_mascotas.php<?= $editando ? '?id=' . $id : '' ?>" enctype="multipart/form-data" novalidate>
     <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
@@ -498,7 +354,7 @@ $adminActivo = 'Mascotas';
             <fieldset class="rm-sec">
                 <legend>Datos básicos</legend>
 
-                <div class="campo" style="margin-top:0">
+                <div class="campo campo-primero">
                     <label for="nombre">Nombre</label>
                     <input type="text" id="nombre" name="nombre" maxlength="100" required
                            value="<?= e($v['nombre']) ?>" <?= $inv('nombre') ?>>
@@ -515,7 +371,7 @@ $adminActivo = 'Mascotas';
                             </label>
                         <?php endforeach; ?>
 
-                        <span style="flex:1"></span>
+                        <span class="espaciador"></span>
 
                         <label class="chip">
                             <input type="radio" name="sexo" value="macho" <?= $chk($v['sexo'] === 'macho') ?>>
@@ -588,7 +444,7 @@ $adminActivo = 'Mascotas';
 
             <fieldset class="rm-sec">
                 <legend>Historia</legend>
-                <label for="descripcion" class="opc" style="position:absolute;left:-999px">Historia</label>
+                <label for="descripcion" class="solo-lector">Historia</label>
                 <textarea id="descripcion" name="descripcion"
                           placeholder="Cómo llegó, personalidad, cuidados…"><?= e($v['descripcion']) ?></textarea>
             </fieldset>
@@ -632,7 +488,7 @@ $adminActivo = 'Mascotas';
             <fieldset class="rm-sec">
                 <legend>Estado</legend>
 
-                <div class="campo" style="margin-top:0">
+                <div class="campo campo-primero">
                     <label for="estado">Estado al publicar</label>
                     <select id="estado" name="estado" <?= $inv('estado') ?>>
                         <?php foreach (ESTADOS_PUB as $valor => $texto): ?>
