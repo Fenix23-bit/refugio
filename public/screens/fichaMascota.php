@@ -32,7 +32,36 @@ if (!$id) {
 $usuario      = usuario_actual();
 $mensajeOk    = '';
 $mensajeError = '';
+$esFavorito = false;
 $yaSolicito   = false;
+$yaAdoptada   = false;
+
+// ENDPOINT AJAX PARA GUARDAR / QUITAR FAVORITOS
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'toggle_favorito') {
+    header('Content-Type: application/json; charset=utf-8');
+    if (!$usuario) {
+        $_SESSION['flash'] = 'Inicia sesión para guardar tus mascotas favoritas.';
+        echo json_encode(['ok' => false, 'redirect' => 'login.php']);
+        exit;
+    }
+
+    try {
+        $stExiste = $pdo->prepare('SELECT id FROM guardados WHERE usuario_id = ? AND mascota_id = ? LIMIT 1');
+        $stExiste->execute([$usuario['id'], $id]);
+        $fila = $stExiste->fetch();
+
+        if ($fila) {
+            $pdo->prepare('DELETE FROM guardados WHERE id = ?')->execute([$fila['id']]);
+            echo json_encode(['ok' => true, 'guardado' => false]);
+        } else {
+            $pdo->prepare('INSERT INTO guardados (usuario_id, mascota_id) VALUES (?, ?)')->execute([$usuario['id'], $id]);
+            echo json_encode(['ok' => true, 'guardado' => true]);
+        }
+    } catch (PDOException $ex) {
+        echo json_encode(['ok' => false]);
+    }
+    exit;
+}
 
 // ===============================================
 // PROCESAR "INICIAR SOLICITUD"
@@ -45,12 +74,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inici
         exit;
     }
 
-    //Validar CSRF igual que en login.php
+    //Validar CSRF
     if (!csrf_valido()) {
         $mensajeError = 'La sesión expiró. Recarga la página e intenta de nuevo.';
     } else {
         try {
-            // 3. Revisar si la mascota sigue disponible
+            // Revisar si la mascota sigue disponible
             $stCheck = $pdo->prepare('SELECT disponible, estado FROM mascotas WHERE id = ? LIMIT 1');
             $stCheck->execute([$id]);
             $estadoMascota = $stCheck->fetch();
@@ -58,29 +87,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inici
             if (!$estadoMascota || !$estadoMascota['disponible'] || $estadoMascota['estado'] !== 'disponible') {
                 $mensajeError = 'Esta mascota ya no se encuentra disponible para adopción.';
             } else {
-                // 4. Evitar solicitudes duplicadas del mismo usuario para la misma mascota
-                $stDup = $pdo->prepare("
-                    SELECT id FROM solicitudes_adopcion
-                     WHERE usuario_id = ? AND mascota_id = ? AND estado IN ('pendiente', 'aceptada')
-                     LIMIT 1
-                ");
-                $stDup->execute([$usuario['id'], $id]);
-
-                if ($stDup->fetch()) {
-                    $mensajeError = 'Ya tienes una solicitud activa para esta mascota.';
+                // Evitar solicitudes duplicadas del mismo usuario para la misma mascota
+$motivo = trim($_POST['motivo'] ?? '');
+                if ($motivo === '') {
+                    $mensajeError = 'Por favor escribe un comentario explicando por qué deseas adoptar a ' . ($mascota['nombre'] ?? 'esta mascota') . '.';
                 } else {
-                    // 5. Insertar en solicitudes_adopcion
-                    $stIns = $pdo->prepare("
-                        INSERT INTO solicitudes_adopcion (usuario_id, mascota_id, motivo, estado)
-                        VALUES (?, ?, ?, 'pendiente')
+                    $stDup = $pdo->prepare("
+                        SELECT id FROM solicitudes_adopcion
+                         WHERE usuario_id = ? AND mascota_id = ? AND estado IN ('pendiente', 'aceptada')
+                         LIMIT 1
                     ");
-                    $stIns->execute([
-                        $usuario['id'],
-                        $id,
-                        'Solicitud iniciada desde la ficha de mascota.'
-                    ]);
+                    $stDup->execute([$usuario['id'], $id]);
 
-                    $mensajeOk = '¡Tu solicitud de adopción fue enviada! Puedes verla en tu panel.';
+                    if ($stDup->fetch()) {
+                        $mensajeError = 'Ya tienes una solicitud activa para esta mascota.';
+                    } else {
+                        $stIns = $pdo->prepare("
+                            INSERT INTO solicitudes_adopcion (usuario_id, mascota_id, motivo, estado)
+                            VALUES (?, ?, ?, 'pendiente')
+                        ");
+                        $stIns->execute([
+                            $usuario['id'],
+                            $id,
+                            $motivo
+                        ]);
+
+                        $mensajeOk = '¡Tu solicitud de adopción fue enviada! Puedes verla en tu panel.';
+                    }
                 }
             }
         } catch (PDOException $ex) {
@@ -105,7 +138,15 @@ try {
     $st->execute([$id]);
     $mascota = $st->fetch();
 
-    if ($mascota) {
+if ($mascota) {
+        $stAceptada = $pdo->prepare("
+            SELECT 1 FROM solicitudes_adopcion
+             WHERE mascota_id = ? AND estado = 'aceptada'
+             LIMIT 1
+        ");
+        $stAceptada->execute([$id]);
+        $yaAdoptada = (bool) $stAceptada->fetch();
+
         if ($usuario) {
             $stSol = $pdo->prepare("
                 SELECT id FROM solicitudes_adopcion
@@ -114,6 +155,9 @@ try {
             ");
             $stSol->execute([$usuario['id'], $id]);
             $yaSolicito = (bool) $stSol->fetch();
+            $stFav = $pdo->prepare('SELECT 1 FROM guardados WHERE usuario_id = ? AND mascota_id = ? LIMIT 1');
+            $stFav->execute([$usuario['id'], $id]);
+            $esFavorito = (bool) $stFav->fetch();
         }
 
         // Fotos de la galería
@@ -349,19 +393,51 @@ require __DIR__ . '/../partials/header.php';
             </li>
         </ol>
 
-        <div class="ficha-acciones">
-            <?php if ($mascota['disponible'] && $mascota['estado'] === 'disponible'): ?>
+<div class="ficha-acciones">
+            <?php if ($mascota['disponible'] && $mascota['estado'] === 'disponible' && !$yaAdoptada): ?>
                 <?php if ($yaSolicito): ?>
-                    <span class="pill pill-ok">Ya enviaste una solicitud para <?= e($mascota['nombre']) ?></span>
+                    <div class="ficha-botones-fila">
+                        <span class="pill pill-ok">Ya enviaste una solicitud para <?= e($mascota['nombre']) ?></span>
+                        <button
+                            type="button"
+                            id="btnFavFicha"
+                            class="btn btn-sec btn-fav-ficha <?= $esFavorito ? 'activo' : '' ?>"
+                            aria-pressed="<?= $esFavorito ? 'true' : 'false' ?>"
+                        >
+                            <?= $esFavorito ? '♥ Guardado' : '♡ Guardar en favoritos' ?>
+                        </button>
+                    </div>
                 <?php else: ?>
-                    <form method="post" action="fichaMascota.php?id=<?= (int) $mascota['id'] ?>" style="margin:0;">
+                    <form method="post" action="fichaMascota.php?id=<?= (int) $mascota['id'] ?>" class="ficha-solicitud-form">
                         <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
                         <input type="hidden" name="accion" value="iniciar_solicitud">
-                        <button type="submit" class="btn">Iniciar solicitud</button>
+
+                        <div class="ficha-motivo-campo">
+                            <label for="motivo-adopcion">¿Por qué te gustaría adoptar a <?= e($mascota['nombre']) ?>?</label>
+                            <textarea
+                                id="motivo-adopcion"
+                                name="motivo"
+                                rows="3"
+                                required
+                                placeholder="Cuéntanos sobre tu hogar, experiencia con mascotas y por qué te gustaría adoptarlo..."
+                            ><?= e($_POST['motivo'] ?? '') ?></textarea>
+                        </div>
+
+                        <div class="ficha-botones-fila">
+                            <button type="submit" class="btn">Iniciar solicitud</button>
+                            <button
+                                type="button"
+                                id="btnFavFicha"
+                                class="btn btn-sec btn-fav-ficha <?= $esFavorito ? 'activo' : '' ?>"
+                                aria-pressed="<?= $esFavorito ? 'true' : 'false' ?>"
+                            >
+                                <?= $esFavorito ? '♥ Guardado' : '♡ Guardar en favoritos' ?>
+                            </button>
+                        </div>
                     </form>
                 <?php endif; ?>
             <?php else: ?>
-                <span class="pill">Estado actual: <?= e(ucfirst($mascota['estado'])) ?></span>
+                <span class="pill">Esta mascota ya fue adoptada</span>
             <?php endif; ?>
         </div>
     </div>
@@ -414,6 +490,33 @@ document.addEventListener('DOMContentLoaded', () => {
             mostrarSlide(parseInt(btn.dataset.irFoto, 10));
             document.querySelector('.ficha-hero')?.scrollIntoView({ behavior: 'smooth' });
         });
+    });
+
+    const btnFav = document.getElementById('btnFavFicha');
+    btnFav?.addEventListener('click', async () => {
+        const datos = new FormData();
+        datos.append('accion', 'toggle_favorito');
+
+        try {
+            const res = await fetch('fichaMascota.php?id=<?= (int) $mascota['id'] ?>', {
+                method: 'POST',
+                body: datos
+            });
+            const json = await res.json();
+
+            if (json.redirect) {
+                window.location.href = json.redirect;
+                return;
+            }
+
+            if (json.ok) {
+                btnFav.classList.toggle('activo', json.guardado);
+                btnFav.setAttribute('aria-pressed', json.guardado ? 'true' : 'false');
+                btnFav.textContent = json.guardado ? '♥ Guardado' : '♡ Guardar en favoritos';
+            }
+        } catch (err) {
+            console.error('Error al actualizar favoritos', err);
+        }
     });
 });
 </script>

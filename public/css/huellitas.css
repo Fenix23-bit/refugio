@@ -371,6 +371,47 @@ a {
     background: var(--papel);
 }
 
+.tarjeta-mascota {
+    position: relative;
+}
+
+.btn-fav {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1.5px solid var(--verde);
+    border-radius: 50%;
+    background: rgba(255, 253, 248, .92);
+    color: var(--verde);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+
+.btn-fav:hover {
+    transform: scale(1.08);
+    background: var(--salvia);
+}
+
+.btn-fav.activo {
+    background: var(--naranja);
+    border-color: var(--naranja);
+    color: #fff;
+}
+
+.btn-fav-ficha.activo {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: var(--bg);
+}
+
 .foto {
     display: block;
     width: 100%;
@@ -933,7 +974,21 @@ html:not(.js) .campo-pass input {
     }
 }
 
+.pill {
+    display: inline-block;
+    padding: 6px 16px;
+    border: 1.5px solid var(--verde);
+    border-radius: 999px;
+    font-size: .82rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
 
+.pill-ok {
+    background: #6b7468;
+    border-color: #6b7468;
+    color: #fff;
+}
 
 /* Filtros en el catálogo */
 .filtros-barra {
@@ -1383,6 +1438,39 @@ html:not(.js) .campo-pass input {
     margin-top: 28px;
 }
 
+/* Formulario con comentario en Ficha de Mascota */
+.ficha-solicitud-form {
+    width: 100%;
+    max-width: 620px;
+}
+
+.ficha-motivo-campo {
+    margin-bottom: 16px;
+}
+
+.ficha-motivo-campo textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1.5px solid var(--verde);
+    border-radius: 22px;
+    background: var(--papel);
+    color: var(--verde);
+    font: inherit;
+    resize: vertical;
+}
+
+.ficha-motivo-campo textarea:focus {
+    outline: 3px solid var(--naranja);
+    outline-offset: 1px;
+}
+
+.ficha-botones-fila {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
 @media (max-width: 760px) {
     .ficha-breadcrumb {
         justify-content: flex-start;
@@ -1408,6 +1496,14 @@ html:not(.js) .campo-pass input {
         flex-direction: column;
         text-align: center;
         gap: 6px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .catalogo .contenedor,
+    .ficha-page .contenedor {
+        width: auto;
+        margin-inline: 5rem;
     }
 }
 

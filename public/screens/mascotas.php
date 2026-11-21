@@ -41,7 +41,20 @@ $leerArray = function (string $campo, array $permitidos): array {
 // Obtener razas disponibles desde BD
 $razasDisponibles = [];
 try {
-    $stRazas = $pdo->query("SELECT DISTINCT raza FROM mascotas WHERE disponible = 1 AND raza IS NOT NULL AND raza <> '' ORDER BY raza ASC");
+    $stRazas = $pdo->query("
+        SELECT DISTINCT m.raza
+          FROM mascotas m
+         WHERE m.disponible = 1
+           AND m.estado = 'disponible'
+           AND NOT EXISTS (
+               SELECT 1 FROM solicitudes_adopcion sa
+                WHERE sa.mascota_id = m.id
+                  AND sa.estado = 'aceptada'
+           )
+           AND m.raza IS NOT NULL
+           AND m.raza <> ''
+         ORDER BY m.raza ASC
+    ");
     $razasDisponibles = $stRazas->fetchAll(PDO::FETCH_COLUMN);
 } catch (PDOException $ex) {
     $razasDisponibles = [];
@@ -74,11 +87,17 @@ if ($filtros['apto_mascotas']) $totalFiltrosActivos++;
 $hayFiltros = $totalFiltrosActivos > 0;
 
 // Consultas
-$sql = 'SELECT m.id, m.nombre, m.sexo, m.raza, m.edad_meses, m.tamano, m.imagen,
+$sql = "SELECT m.id, m.nombre, m.sexo, m.raza, m.edad_meses, m.tamano, m.imagen,
                m.apto_ninos, m.apto_mascotas, s.nombre AS especie
           FROM mascotas m
           JOIN especies s ON s.id = m.especie_id
-         WHERE m.disponible = 1';
+         WHERE m.disponible = 1
+           AND m.estado = 'disponible'
+           AND NOT EXISTS (
+               SELECT 1 FROM solicitudes_adopcion sa
+                WHERE sa.mascota_id = m.id
+                  AND sa.estado = 'aceptada'
+           )";
 $params = [];
 
 if ($filtros['especie'] !== '') {
@@ -142,7 +161,53 @@ try {
     $mascotas = [];
 }
 
-$usuario   = usuario_actual();
+$usuario = usuario_actual();
+
+// 1. Endpoint rápido para guardar/quitar favorito sin recargar (POST AJAX)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'toggle_favorito') {
+    header('Content-Type: application/json; charset=utf-8');
+    if (!$usuario) {
+        $_SESSION['flash'] = 'Inicia sesión para guardar tus mascotas favoritas.';
+        echo json_encode(['ok' => false, 'redirect' => 'login.php']);
+        exit;
+    }
+
+    $mascotaId = filter_input(INPUT_POST, 'mascota_id', FILTER_VALIDATE_INT);
+    if (!$mascotaId) {
+        echo json_encode(['ok' => false]);
+        exit;
+    }
+
+    try {
+        $stExiste = $pdo->prepare('SELECT id FROM guardados WHERE usuario_id = ? AND mascota_id = ? LIMIT 1');
+        $stExiste->execute([$usuario['id'], $mascotaId]);
+        $fila = $stExiste->fetch();
+
+        if ($fila) {
+            $pdo->prepare('DELETE FROM guardados WHERE id = ?')->execute([$fila['id']]);
+            echo json_encode(['ok' => true, 'guardado' => false]);
+        } else {
+            $pdo->prepare('INSERT INTO guardados (usuario_id, mascota_id) VALUES (?, ?)')->execute([$usuario['id'], $mascotaId]);
+            echo json_encode(['ok' => true, 'guardado' => true]);
+        }
+    } catch (PDOException $ex) {
+        echo json_encode(['ok' => false]);
+    }
+    exit;
+}
+
+// Obtener IDs de mascotas guardadas
+$guardadosIds = [];
+if ($usuario) {
+    try {
+        $stG = $pdo->prepare('SELECT mascota_id FROM guardados WHERE usuario_id = ?');
+        $stG->execute([$usuario['id']]);
+        $guardadosIds = array_flip($stG->fetchAll(PDO::FETCH_COLUMN));
+    } catch (PDOException $ex) {
+        $guardadosIds = [];
+    }
+}
+
 $bodyClass = 'catalogo';
 require __DIR__ . '/../partials/header.php';
 ?>
@@ -286,7 +351,19 @@ require __DIR__ . '/../partials/header.php';
             <?php else: ?>
                 <ul class="tarjetas catalogo-grid">
                     <?php foreach ($mascotas as $m): ?>
+                        <?php $esFavorito = isset($guardadosIds[$m['id']]); ?>
                         <li class="tarjeta-mascota">
+                            <button
+                                type="button"
+                                class="btn-fav <?= $esFavorito ? 'activo' : '' ?>"
+                                data-mascota-id="<?= (int) $m['id'] ?>"
+                                aria-pressed="<?= $esFavorito ? 'true' : 'false' ?>"
+                                aria-label="<?= $esFavorito ? 'Quitar de guardados' : 'Guardar en favoritos' ?>"
+                                title="<?= $esFavorito ? 'Quitar de favoritos' : 'Guardar en favoritos' ?>"
+                            >
+                                <?= $esFavorito ? '♥' : '♡' ?>
+                            </button>
+
                             <a class="tarjeta-link" href="fichaMascota.php?id=<?= (int) $m['id'] ?>">
                                 <?php if (!empty($m['imagen'])): ?>
                                     <img class="foto" src="../img/mascotas/<?= e(basename($m['imagen'])) ?>" alt="<?= e($m['nombre']) ?>" loading="lazy">
@@ -354,6 +431,37 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     cerrar?.addEventListener('click', cerrarFn);
     backdrop?.addEventListener('click', cerrarFn);
+
+    // Botón de favoritos
+    document.querySelectorAll('.btn-fav').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const datos = new FormData();
+            datos.append('accion', 'toggle_favorito');
+            datos.append('mascota_id', btn.dataset.mascotaId);
+
+            try {
+                const res = await fetch('', { method: 'POST', body: datos });
+                const json = await res.json();
+
+                if (json.redirect) {
+                    window.location.href = json.redirect;
+                    return;
+                }
+
+                if (json.ok) {
+                    btn.classList.toggle('activo', json.guardado);
+                    btn.setAttribute('aria-pressed', json.guardado ? 'true' : 'false');
+                    btn.textContent = json.guardado ? '♥' : '♡';
+                    btn.title = json.guardado ? 'Quitar de favoritos' : 'Guardar en favoritos';
+                }
+            } catch (err) {
+                console.error('Error al actualizar favoritos', err);
+            }
+        });
+    });
 });
 </script>
 
