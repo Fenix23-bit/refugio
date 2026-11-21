@@ -92,5 +92,15 @@ CREATE TABLE solicitudes_adopcion (
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+CREATE TABLE guardados (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  usuario_id INT UNSIGNED NOT NULL,
+  mascota_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_guardado (usuario_id, mascota_id),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  FOREIGN KEY (mascota_id) REFERENCES mascotas(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- Asegurar especies base
 INSERT IGNORE INTO especies (id, nombre) VALUES (1, 'Perro'), (2, 'Gato');

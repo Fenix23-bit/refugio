@@ -767,7 +767,7 @@ html:not(.js) .campo-pass input {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 30%; /* encuadre: "x y" (0% = izquierda/arriba, 100% = derecha/abajo) */
+    object-position: center 30%;
 }
 
 .ph-nombre {
@@ -906,8 +906,6 @@ html:not(.js) .campo-pass input {
 }
 
 
-
-/* Inicio a todo el ancho (alineado con el header) */
 .inicio .contenedor {
     width: auto;
     margin-inline: 5rem;
@@ -1135,9 +1133,6 @@ html:not(.js) .campo-pass input {
     box-shadow: 0 8px 20px rgba(36, 58, 51, .12);
 }
 
-/* =========================================================
-   Ficha de Mascota 1i (Pestañas + progreso de adopción)
-   ========================================================= */
 .ficha-seccion {
     padding-block: 24px 56px;
 }
@@ -1401,5 +1396,385 @@ html:not(.js) .campo-pass input {
         flex-direction: column;
         text-align: center;
         gap: 6px;
+    }
+}
+
+
+/* Panel de usuario */
+body.panel main {
+    display: flex;
+}
+
+.pn {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    flex: 1;
+    width: 100%;
+    background: var(--papel);
+}
+
+.pn-lado {
+    display: flex;
+    flex-direction: column;
+    padding: 32px 16px;
+    background: var(--salvia);
+}
+
+.pn-rol {
+    margin: 0 0 10px 4px;
+    color: var(--cafe);
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .1em;
+}
+
+.pn-lado nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pn-lado nav a,
+.pn-salir button {
+    display: block;
+    width: 100%;
+    padding: 9px 16px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--verde);
+    font: 600 .8rem var(--sans);
+    letter-spacing: .08em;
+    text-align: left;
+    text-decoration: none;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.pn-lado nav a:hover,
+.pn-salir button:hover {
+    background: rgba(255, 253, 248, .7);
+}
+
+.pn-lado nav a[aria-current="page"] {
+    background: #66765f;
+    color: #fff;
+}
+
+.pn-salir {
+    margin-top: auto;
+    padding-top: 24px;
+}
+
+.pn-main {
+    min-width: 0;
+    padding: 40px 56px 48px;
+}
+
+.pn-main h1 {
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.pn-main h2 {
+    font-size: 1.2rem;
+}
+
+.pn-main .alerta {
+    margin-bottom: 18px;
+}
+
+.pn-activa {
+    padding: 22px 24px;
+    border: 1.5px solid var(--verde);
+    border-radius: 28px;
+    background: #f8dcd6;
+}
+
+.pn-activa-top {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.pn-avatar,
+.pn-foto {
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 1.5px dashed var(--verde);
+    background: rgba(255, 253, 248, .6);
+}
+
+.pn-avatar {
+    flex: none;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+}
+
+.pn-avatar img,
+.pn-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pn-avatar svg,
+.pn-foto svg {
+    width: 28px;
+    height: 28px;
+    fill: var(--verde);
+    opacity: .5;
+}
+
+.pn-activa-info,
+.pn-sol-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.pn-activa p,
+.pn-sol-info p {
+    margin: 0;
+}
+
+.pn-eyebrow {
+    color: var(--cafe);
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.pn-activa-mascota {
+    margin: 0;
+    font-weight: 600;
+}
+
+.pn-activa-sub {
+    margin: 0;
+    font-size: .88rem;
+}
+
+.pn-pill {
+    display: inline-block;
+    padding: 7px 18px;
+    border: 1.5px solid var(--verde);
+    border-radius: 999px;
+    background: none;
+    color: var(--verde);
+    font: 600 .8rem var(--sans);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.pn-pill-borde:hover {
+    background: var(--verde);
+    color: #fff;
+}
+
+.pn-etapas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pn-etapas li {
+    padding: 4px 16px;
+    border: 1.5px solid var(--verde);
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.pn-etapas li.hecha {
+    background: #66765f;
+    border-color: #66765f;
+    color: #fff;
+}
+
+.pn-vacia {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.pn-vacia .pn-eyebrow {
+    flex-basis: 100%;
+}
+
+.pn-cab {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 30px 0 14px;
+}
+
+.pn-cab a {
+    font-size: .85rem;
+}
+
+.pn-guardados {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pn-guardados-full {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px 20px;
+}
+
+.pn-guardados a {
+    display: block;
+    text-decoration: none;
+}
+
+.pn-foto {
+    aspect-ratio: 4 / 3;
+    border-radius: 24px;
+}
+
+.pn-nombre {
+    display: block;
+    margin-top: 8px;
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.pn-meta {
+    display: block;
+    font-size: .8rem;
+}
+
+.pn-quitar {
+    margin-top: 6px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--naranja);
+    font: 600 .8rem var(--sans);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.pn-nota {
+    margin: 0;
+}
+
+.pn-perfil {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 26px;
+    padding: 16px 24px;
+    border: 1.5px solid var(--verde);
+    border-radius: 999px;
+}
+
+.pn-perfil p {
+    margin: 0;
+    font-size: .92rem;
+}
+
+.pn-sols {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pn-sols li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border: 1.5px solid var(--verde);
+    border-radius: 24px;
+}
+
+.pn-sols form {
+    margin: 0;
+}
+
+.pn-estado {
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.pn-pendiente { color: var(--cafe); }
+.pn-aceptada  { color: #3e6b4f; }
+.pn-cancelada { color: #777; }
+
+.pn-form {
+    max-width: 460px;
+    margin-bottom: 36px;
+}
+
+.pn-form h2 {
+    margin-bottom: 4px;
+}
+
+.pn-form .btn {
+    margin-top: 22px;
+}
+
+.pn-form input[readonly] {
+    opacity: .7;
+}
+
+@media (max-width: 800px) {
+    .pn {
+        grid-template-columns: 1fr;
+    }
+
+    .pn-lado {
+        padding: 16px;
+    }
+
+    .pn-lado nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .pn-lado nav a,
+    .pn-salir button {
+        width: auto;
+    }
+
+    .pn-salir {
+        margin-top: 8px;
+        padding-top: 0;
+    }
+
+    .pn-main {
+        padding: 24px 20px;
+    }
+
+    .pn-guardados,
+    .pn-guardados-full {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pn-activa-top,
+    .pn-perfil,
+    .pn-sols li {
+        flex-wrap: wrap;
+    }
+
+    .pn-perfil {
+        border-radius: 28px;
     }
 }
