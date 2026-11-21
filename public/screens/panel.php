@@ -192,7 +192,6 @@ $menu = [
     'datos'       => 'Mis datos',
 ];
 
-$titulo    = 'Mi cuenta';
 $activo    = 'panel';
 $bodyClass = 'panel';
 require __DIR__ . '/../partials/header.php';

@@ -66,7 +66,6 @@ function attr_error(array $errores, string $campo): string
     return isset($errores[$campo]) ? ' aria-invalid="true" aria-describedby="err-' . $campo . '"' : '';
 }
 
-$titulo    = 'Crear cuenta';
 $activo    = 'registro';
 $bodyClass = 'auth';
 require __DIR__ . '/../partials/header.php';

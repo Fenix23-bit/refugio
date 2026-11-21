@@ -13,13 +13,8 @@ require_once __DIR__ . '/../../config/database.php'; // debe definir $pdo
 
 /* ---------- Acceso: solo admin ---------- */
 $usuario = usuario_actual();
-if (!$usuario) {
-    header('Location: login.php');
-    exit;
-}
-if (($usuario['rol'] ?? '') !== 'admin') {
-    http_response_code(403);
-    exit('Acceso restringido a administradores.');
+if (!$usuario || ($usuario['rol'] ?? '') !== 'admin') {
+    acceso_denegado();
 }
 
 /* ---------- Constantes ---------- */

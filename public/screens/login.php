@@ -38,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$titulo    = 'Iniciar sesión';
 $activo    = 'login';
 $bodyClass = 'auth';
 require __DIR__ . '/../partials/header.php';
