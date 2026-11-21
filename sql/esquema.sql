@@ -79,6 +79,7 @@ CREATE TABLE solicitudes_adopcion (
   fecha      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   motivo     TEXT NULL,
   estado     ENUM('pendiente','aceptada','cancelada') NOT NULL DEFAULT 'pendiente',
+  fecha_resolucion DATETIME NULL,
   PRIMARY KEY (id),
   KEY idx_solicitudes_usuario (usuario_id),
   KEY idx_solicitudes_mascota (mascota_id),

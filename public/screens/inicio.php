@@ -57,7 +57,7 @@ require __DIR__ . '/../partials/header.php';
         <h2>Te están esperando</h2>
 
         <div class="espera-grid">
-            <a class="ph ph-grande" href="mascotas.php">
+            <a class="ph ph-grande" href="<?= $destacada ? 'fichaMascota.php?id=' . (int) $destacada['id'] : 'mascotas.php' ?>">
                 <?php if ($destacada && !empty($destacada['imagen'])): ?>
                     <img src="../<?= e($destacada['imagen']) ?>" alt="<?= e($destacada['nombre']) ?>">
                 <?php else: ?>
@@ -66,7 +66,7 @@ require __DIR__ . '/../partials/header.php';
             </a>
 
             <?php for ($i = 0; $i < 3; $i++): $m = $otras[$i] ?? null; ?>
-                <a class="ph" href="mascotas.php">
+                <a class="ph" href="<?= $m ? 'fichaMascota.php?id=' . (int) $m['id'] : 'mascotas.php' ?>">
                     <?php if ($m && !empty($m['imagen'])): ?>
                         <img src="../<?= e($m['imagen']) ?>" alt="<?= e($m['nombre']) ?>" loading="lazy">
                     <?php endif; ?>

@@ -17,8 +17,8 @@ try {
     $adopMes = (int) $pdo->query(
         "SELECT COUNT(*) FROM solicitudes_adopcion
           WHERE estado = 'aceptada'
-            AND fecha >= DATE_FORMAT(CURDATE(), '%Y-%m-01')
-            AND fecha <  DATE_FORMAT(CURDATE(), '%Y-%m-01') + INTERVAL 1 MONTH"
+            AND COALESCE(fecha_resolucion, fecha) >= DATE_FORMAT(CURDATE(), '%Y-%m-01')
+            AND COALESCE(fecha_resolucion, fecha) <  DATE_FORMAT(CURDATE(), '%Y-%m-01') + INTERVAL 1 MONTH"
     )->fetchColumn();
 
     $stats = [
@@ -39,6 +39,31 @@ try {
 } catch (PDOException $ex) {
     $stats = [['EN REFUGIO', 0], ['SOLICITUDES', 0], ['ADOPCIONES MES', 0]];
 }
+
+// Gráfica: adopciones aceptadas por mes, últimos 6 meses (los meses sin datos valen 0)
+const MESES_CORTOS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+$serie = [];
+for ($i = 5; $i >= 0; $i--) {
+    $t = strtotime("first day of -$i month");
+    $serie[date('Y-m', $t)] = ['mes' => MESES_CORTOS[(int) date('n', $t) - 1], 'total' => 0];
+}
+try {
+    $filas = $pdo->query(
+        "SELECT DATE_FORMAT(COALESCE(fecha_resolucion, fecha), '%Y-%m') AS ym, COUNT(*) AS total
+           FROM solicitudes_adopcion
+          WHERE estado = 'aceptada'
+            AND COALESCE(fecha_resolucion, fecha) >= DATE_SUB(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 5 MONTH)
+          GROUP BY ym"
+    )->fetchAll();
+    foreach ($filas as $f) {
+        if (isset($serie[$f['ym']])) {
+            $serie[$f['ym']]['total'] = (int) $f['total'];
+        }
+    }
+} catch (PDOException $ex) {
+    // se deja la serie en ceros
+}
+$maxSerie = max(1, ...array_column($serie, 'total'));
 $adminActivo = 'Panel';
 ?>
 <!DOCTYPE html>
@@ -91,7 +116,18 @@ $adminActivo = 'Panel';
 
         <section class="admin-card">
             <h2>Adopciones por mes</h2>
-            <div class="grafica">gráfica de barras</div>
+            <div class="barras" role="img"
+                 aria-label="Adopciones por mes: <?= e(implode(', ', array_map(fn($m) => $m['mes'] . ' ' . $m['total'], $serie))) ?>">
+                <?php foreach ($serie as $m): ?>
+                    <div class="barra-col">
+                        <span class="barra-num"><?= $m['total'] ?></span>
+                        <div class="barra-pista">
+                            <div class="barra<?= $m['total'] === 0 ? ' barra-cero' : '' ?>" style="--alto: <?= round($m['total'] / $maxSerie * 100) ?>%"></div>
+                        </div>
+                        <span class="barra-mes"><?= e($m['mes']) ?></span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </section>
     </main>
 </div>

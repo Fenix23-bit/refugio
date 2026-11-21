@@ -31,7 +31,6 @@ $tituloDoc = isset($titulo) ? $titulo . ' | Huellitas' : 'Huellitas';
         </symbol>
     </svg>
 
-    <a class="saltar" href="#contenido">Saltar al contenido</a>
 
     <header class="top">
         <div class="contenedor_header top-in">

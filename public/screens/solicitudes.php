@@ -40,9 +40,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($idPost < 1 || !isset(ESTADOS[$estadoPost])) {
         $errorGeneral = 'No se pudo actualizar el estado.';
     } else {
-        $pdo->prepare('UPDATE solicitudes_adopcion SET estado = ? WHERE id = ?')->execute([$estadoPost, $idPost]);
-        header('Location: solicitudes.php' . $qs(['ok' => 'estado']));
-        exit;
+        $pdo->beginTransaction();
+        try {
+            // Solicitud y mascota (se bloquea la fila de la mascota para que dos admins no acepten a la vez)
+            $st = $pdo->prepare(
+                'SELECT sa.mascota_id, m.nombre AS mascota
+                   FROM solicitudes_adopcion sa
+                   JOIN mascotas m ON m.id = sa.mascota_id
+                  WHERE sa.id = ?
+                    FOR UPDATE'
+            );
+            $st->execute([$idPost]);
+            $sol = $st->fetch(PDO::FETCH_ASSOC);
+
+            if (!$sol) {
+                $pdo->rollBack();
+                $errorGeneral = 'La solicitud no existe.';
+            } else {
+                $yaAceptada = null;
+                if ($estadoPost === 'aceptada') {
+                    // Solo puede haber una solicitud aceptada por mascota
+                    $st = $pdo->prepare(
+                        "SELECT u.nombre
+                           FROM solicitudes_adopcion sa
+                           JOIN usuarios u ON u.id = sa.usuario_id
+                          WHERE sa.mascota_id = ? AND sa.estado = 'aceptada' AND sa.id <> ?
+                          LIMIT 1"
+                    );
+                    $st->execute([$sol['mascota_id'], $idPost]);
+                    $yaAceptada = $st->fetchColumn();
+                }
+
+                if ($yaAceptada !== null && $yaAceptada !== false) {
+                    $pdo->rollBack();
+                    $errorGeneral = 'Advertencia: ' . $sol['mascota'] . ' ya tiene una solicitud aceptada (de '
+                        . $yaAceptada . '). Cancela o regresa a pendiente esa solicitud antes de aceptar otra.';
+                } else {
+                    // fecha_resolucion: se borra al volver a "pendiente"; se fija al resolver (y no cambia si el estado es el mismo)
+                    $pdo->prepare(
+                        "UPDATE solicitudes_adopcion
+                            SET fecha_resolucion = CASE
+                                    WHEN ? = 'pendiente' THEN NULL
+                                    WHEN estado = ? THEN COALESCE(fecha_resolucion, NOW())
+                                    ELSE NOW()
+                                END,
+                                estado = ?
+                          WHERE id = ?"
+                    )->execute([$estadoPost, $estadoPost, $estadoPost, $idPost]);
+                    $pdo->commit();
+                    header('Location: solicitudes.php' . $qs(['ok' => 'estado']));
+                    exit;
+                }
+            }
+        } catch (Throwable $ex) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            $errorGeneral = 'No se pudo actualizar el estado.';
+        }
     }
 }
 
