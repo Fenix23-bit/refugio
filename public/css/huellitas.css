@@ -954,6 +954,18 @@ html:not(.js) .campo-pass input {
 }
 
 /*Catálogo*/
+/* A todo el ancho, con el mismo margen lateral que el header (sin tope de 1120px) */
+.catalogo .contenedor {
+    width: auto;
+    margin-inline: 5rem;
+}
+
+@media (max-width: 760px) {
+    .catalogo .contenedor {
+        margin-inline: 20px;
+    }
+}
+
 .catalogo-layout {
     display: grid;
     grid-template-columns: 220px 1fr;
@@ -1052,7 +1064,7 @@ html:not(.js) .campo-pass input {
 }
 
 .catalogo-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
 .btn-movil-filtros,
