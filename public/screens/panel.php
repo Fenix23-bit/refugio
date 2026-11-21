@@ -209,12 +209,17 @@ function foto_pn(?string $imagen, string $alt = ''): void
 
 <div class="pn">
     <aside class="pn-lado">
-        <p class="pn-rol">MI CUENTA</p>
-        <nav aria-label="Mi cuenta">
-            <?php foreach ($menu as $clave => $texto): ?>
-                <a href="<?= e($url($clave)) ?>" <?= $clave === $vista ? 'aria-current="page"' : '' ?>><?= e($texto) ?></a>
-            <?php endforeach; ?>
-        </nav>
+        <div class="pn-lado-cab">
+            <p class="pn-rol">MI CUENTA</p>
+            <button type="button" class="pn-toggle" aria-expanded="false" aria-controls="pn-menu"><img src="../img/icons/config.svg" alt="Menú" loading="lazy"></button>
+        </div>
+        <div class="pn-menu" id="pn-menu">
+            <nav aria-label="Mi cuenta">
+                <?php foreach ($menu as $clave => $texto): ?>
+                    <a href="<?= e($url($clave)) ?>" <?= $clave === $vista ? 'aria-current="page"' : '' ?>><?= e($texto) ?></a>
+                <?php endforeach; ?>
+            </nav>
+        </div>
     </aside>
 
     <section class="pn-main">
@@ -359,5 +364,17 @@ function foto_pn(?string $imagen, string $alt = ''): void
 <?php endif; ?>
     </section>
 </div>
+
+<script>
+(function () {
+    var btn = document.querySelector('.pn-toggle');
+    var lado = document.querySelector('.pn-lado');
+    if (!btn || !lado) return;
+    btn.addEventListener('click', function () {
+        var abierto = lado.classList.toggle('abierto');
+        btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    });
+})();
+</script>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>

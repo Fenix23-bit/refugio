@@ -1420,6 +1420,36 @@ body.panel main {
     background: var(--salvia);
 }
 
+.pn-lado-cab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pn-toggle {
+    display: none;
+    padding: 8px 12px;
+    border: 1.5px solid var(--verde);
+    border-radius: 999px;
+    background: none;
+    color: var(--verde);
+    font: 600 .95rem var(--sans);
+    cursor: pointer;
+}
+
+.pn-toggle img {
+    display: block;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.pn-menu {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
 .pn-rol {
     margin: 0 0 10px 4px;
     color: var(--cafe);
@@ -1738,25 +1768,28 @@ body.panel main {
 @media (max-width: 800px) {
     .pn {
         grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
     }
 
     .pn-lado {
-        padding: 16px;
+        padding: 12px 20px;
     }
 
-    .pn-lado nav {
-        flex-direction: row;
-        flex-wrap: wrap;
+    .pn-rol {
+        margin: 0;
     }
 
-    .pn-lado nav a,
-    .pn-salir button {
-        width: auto;
+    .js .pn-toggle {
+        display: block;
     }
 
-    .pn-salir {
-        margin-top: 8px;
-        padding-top: 0;
+    .js .pn-menu {
+        display: none;
+        margin-top: 12px;
+    }
+
+    .js .pn-lado.abierto .pn-menu {
+        display: flex;
     }
 
     .pn-main {
